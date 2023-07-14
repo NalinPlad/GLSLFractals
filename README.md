@@ -1,4 +1,0 @@
-# GLSL Fractals
-
-![[Mandlebrot.png]]
-
