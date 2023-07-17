@@ -107,7 +107,24 @@ Now our graph looks like this:
 
 ![[graphIndex4.jpeg|500]]
 
-Well there goes our point... At this point its obvious that if we continue this sequence it will eventually spiral out to infinity.
+Well there goes our point... At this point its obvious that if we continue this sequence it will eventually spiral out to infinity. So we can classify this point as... Drumroll please..... Not in the Mandelbrot set!!!!
+
+
+![[whatjusthappened.gif|300]]
+
+
+
+Ok, lets back up. First, we chose and arbitrary point on the complex plane: `(1,2)`. Then we **recursively called the Mandelbrot Equation on it**. On every iteration we graphed the points new position and saw that as we ran the function for more and more iterations, the points was quickly escaping the graph and heading out towards infinity.
+
+
+So back to what I was saying about this point not being in the Mandelbrot set. *(This next part is an important key concept so listen up)*
+
+**Any point on the complex plane will either blow up to infinity or fall into some sort of stable orbit**
+
+To see what I mean, lets try a different point. This time I'll leave out all of the equations behind the scenes and just show you the end graph.
+
+
+
 
 
 ## old stuff ignore
