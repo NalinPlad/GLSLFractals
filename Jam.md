@@ -125,6 +125,143 @@ To see what I mean, lets try a different point. This time I'll leave out all of 
 
 
 
+# The code
+At long last, its time to take all of our newly gained knowledge and make something out of it. We're going to be using **Shader Toy**, which is kind of like replit for high performance graphics shaders. Shader Toy lets us write **GLSL** shaders that run on the GPU. 
+
+**GLSL** is the language of WebGL, which is a technology that allows developers to write high performance graphics on the web.
+
+Go to `shadertoy.com` and sign up for an account. You can complete this Jam without an account if you want, but if you want to share your finished product or save your shader, you need to sign up for a free account.
+
+Once you are logged in, click the `New` button in the top right.
+
+![[newbutton.png|400]]
+
+After you click that, you'll land on a page that looks like this
+
+![[newshader.png|500]]
+
+I've gone ahead and filled out the Title and Description for this Jam.
+
+We can see that we have a default starter shader already loaded. We're going to start from scratch so begin by replacing all the code in the code box with the following basic script. **Make sure to recompile by clicking the play button at the bottom left of the code box.**
+
+```c
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Output to screen
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+```
+
+Here we can see our main function. **This function will be run for every pixel in our image.** Lets walk through the lines.
+
+```c
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+```
+
+This defines the main function. `mainImage()` is the convention in ShaderToy. We can see that we are outputting a single `vec4` variable named ***fragColor***, and have access to one `vec2` variable named ***fragCoord***.
+
+***fragCoord*** is the basic input to the shader and is different for every pixel. It is basically just a `vec2` containing the x and y position of the current pixel.
+
+
+
+Okay, before we continue, I haven't explained what vectors are, so lets do that quickly;
+
+---
+
+###### What are vectors
+Throughout this Jam, and whenever programming in GLSL, you'll see countless examples of Vectors being used. `vec` is a datatype that is used very prominently in GLSL. They each contain either 2, 3, or 4 entries.
+
+```C
+// Vectors example
+
+// 2D Vector
+vec2 position = vec2(2.0, 3.0)
+
+position.x // => 2.0
+position.y // => 3.0
+
+// OR
+
+position[0] // => 2.0
+position[1] // => 3.0
+
+
+// 3D Vector
+vec3 position_3D = vec3(2.0, 5.3, 1.0)
+
+position_3D.x // => 2.0
+position_3D.y // => 5.3
+position_3D.z // => 1.0
+```
+
+Okay, now back to the shader code
+
+---
+
+```c
+// Normalized pixel coordinates (from 0 to 1)
+vec2 uv = fragCoord/iResolution.xy;
+```
+
+This line just normalizes our coordinates. If we just use the input to the function, `fragCoord`, the values would be from `1 - width/height of screen`, which would be different for every computer and browser running our program. To solve this, we can use ShaderToy's built in variable `iResolution` to get the screens resolution, and divide `fragCoord` by it. Now we have a new variable, `uv`, which is the current pixels position on the screen, normalized so that all the values fall between 0 and 1.
+
+Heres a simple diagram to show what uv coordinates are
+
+![[textureUV.jpeg|700]]
+
+***By default we are given the texture coordinate for the pixel, so in this line we just calculate the corresponding UV coordinate.***
+
+
+
+On to the next line! (Arguably the most important one)
+
+```C
+// Output to screen
+fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+```
+
+This is the equivalent of "`return`" ing a value in most other programming languages. `fragColor` is an special variable in the GLSL language. It stands for the color of the current pixel. It is a `vec4` variable that holds the `RGBA` color.
+
+	`fragColor = vec4(RED, GREEN, BLUE, ALPHA);
+
+Alpha is just a fancy word for opacity, so lets keep it at 100% for now
+
+You may be used to writing color out on a range from 0 to 255. But like we did for the UV coordinates, GLSL expects these values to be normalized, so a value of 1 is 100% and 0 is 0%.
+
+When our shader exits execution, the value of `fragColor` will be applied to the current pixel.
+
+Try modifying your shader to look like this.
+
+```C
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+	// Output based on if current pixels x position is greater than 0.5
+    if(uv.x > 0.5){
+        fragColor = vec4(1.0,0.0,0.0,1.0);
+    } else {
+	    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+}
+```
+
+
+![[outputRedBlack.png|300]]
+
+
+
+
+
+
+
+
+
+
 
 
 ## old stuff ignore
