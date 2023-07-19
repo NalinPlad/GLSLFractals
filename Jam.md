@@ -114,7 +114,7 @@ Well there goes our point... At this point its obvious that if we continue this 
 
 
 
-Ok, lets back up. First, we chose and arbitrary point on the complex plane: `(1,2)`. Then we **recursively called the Mandelbrot Equation on it**. On every iteration we graphed the points new position and saw that as we ran the function for more and more iterations, the points was quickly escaping the graph and heading out towards infinity.
+Ok, lets back up. First, we chose and arbitrary point on the complex plane: `(1,2)`. Then we **recursively called the Mandelbrot Equation on it**. On every iteration we graphed the points new position and saw that as we ran the function for more and more iterations, the point was quickly escaping the graph and heading out towards infinity.
 
 
 So back to what I was saying about this point not being in the Mandelbrot set. *(This next part is an important key concept so listen up)*
@@ -122,6 +122,10 @@ So back to what I was saying about this point not being in the Mandelbrot set. *
 **Any point on the complex plane will either blow up to infinity or fall into some sort of stable orbit**
 
 To see what I mean, lets try a different point. This time I'll leave out all of the equations behind the scenes and just show you the end graph.
+
+![[secondPointPath.jpeg|500]]
+
+You can see that instead of escaping out into infinity, this point seems to do the opposite, and sort of falls in towards the center and floats around. This type of point, one that does not explode out into infinity, *is* in the Mandelbrot set.
 
 
 
@@ -253,14 +257,240 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
 ![[outputRedBlack.png|300]]
 
+Remember that the normalized UV coordinates mean that the halfway line is at x position 0.5, so by coloring pixels who's x UV position is greater than 0.5 red, we get this simple pattern. Try changing 0.5 in the code and seeing what happens.
 
+Another thing you can try is just setting the red value of the `fragColor` to the pixels UV x coordinate
 
+```C
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+    
+    // Output to screen
+    fragColor = vec4(uv.x, 0.0, 0.0, 1.0);
+}
+```
 
+![[outputRed.png|300]]
 
+Then you could even set the blue value equal to the pixel UV y coordinate
 
+```C
+fragColor = vec4(0.0, 0.0, uv.y, 1.0);
+```
 
+![[outputBlue.png|300]]
 
+Then combine them into one statement that sets the Red value to the X position and the blue value to the Y position
 
+```C
+fragColor = vec4(uv.x, 0.0, uv.y, 1.0);
+```
+
+![[outputPurple.png|300]]
+
+## Coding the Mandelbrot set
+Hopefully you're still with me, and hopefully you've either miraculously understood everything up until this point, or you are frantically searching on youtube for a better explanation of the Mandelbrot set(in which case I recommend [this one](https://www.youtube.com/watch?v=GiAj9WW1OfQ), [this one](https://www.youtube.com/watch?v=FFftmWSzgmk), and [The Mandelbrot Set: Atheists’ WORST Nightmare](https://www.youtube.com/watch?v=OlD2rcm971U))(Watch that last one at your own risk)
+
+We are dealing with some pretty high level and abstract mathematical concepts here, so if you want to have a solid foundation going into the end of this Jam, make sure you understand the math.
+
+With that said, lets start coding our final product!
+
+Back in ShaderToy, replace the `fragColor` line and rename the `uv` variable to `c`, because thats the name for the current point in the Mandelbrot equation.
+
+```C
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 c = fragCoord/iResolution.xy;
+    
+    // Output to screen
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+```
+
+Lets define some constants. First, we need a limit for how many times we want to iterate before deciding if the point explodes out to infinity or stays in a stable orbit. The higher the number, the more accurate the image will be, but the slower our program will be.
+
+```C
+// Maximum number of iterations
+int maxIterations = 256;
+```
+
+Lets also add our initial Mandelbrot starting point of (0,0)
+
+```C
+vec2 Z = vec2(0,0)
+```
+
+We can say our variable `c` is a complex number with its x component being the real part and y component being the imaginary part, so lets write out a quick helper function to handle the "complex" arithmetic
+
+```C
+// Squares a given complex number
+vec2 cSquare( in vec2 z ) 
+{
+    return vec2(
+            z.x * z.x - z.y * z.y,
+            2.0 * z.x * z.y
+        );
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 c = fragCoord/iResolution.xy;
+    
+    // Maximum number of iterations
+    int maxIterations = 256;
+
+	// Starting point
+	vec2 Z = vec2(0,0);
+    
+    // Output to screen
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+```
+
+Don't worry too much about this function- Just know that its there because programming languages aren't really designed for complex math. This function just does the math in a way that the computer can understand.
+
+Now it's time to actually implement the Mandelbrot loop. Lets create a for loop in our main function after we define our `maxIterations`.
+
+```C
+for(int i = 0; i < maxIterations; i = i + 1)
+{
+    // Z(n+1) = Z(n)^2 + C
+}
+```
+
+(Also don't worry about the curly braces being indented to the next line its just a thing in GLSL ;)
+
+Now heres where our two functions from earlier come into play. 
+
+```C
+for(int i = 0; i < maxIterations; i++)
+{
+    // Z(n+1) = Z(n)^2 + C
+    vec2 oldZ = Z;
+    Z = cSquare(oldZ) + c;
+} 
+```
+
+Great! Now we just need to check wether or not the point escapes to infinity. In practice, we don't need to check if it actually gets that far, We can just check if it gets farther that **2** units away from the origin. Thats because all of this beautiful behavior happens on a very small scale so anything that makes it that far is almost definitely heading to infinity.
+
+Add this if statement to the bottom of the for loop
+
+```C
+// If the point escapes, color it differently
+if(dot(Z, Z) > 4.0) {
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+} else {
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+```
+
+the `dot()` function is just a way of measuring how far away from the origin the point is.
+
+Re compile and... Nothing! Thats because if we look at the bottom of our code...
+
+```C
+		//...
+        {
+            fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        }
+    }
+    
+    // Output to screen
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+```
+
+We change the value of `fragColor` back to pure black on the last line of the main function. Just delete these lines-
+
+```C
+// Output to screen
+fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+```
+
+And then we get this image:
+
+![[mvpImage.png|300]]
+
+...
+
+![[notGood.gif|300]]
+
+Well hey, at least we're making progress! If we compare our image with another render of the set-
+
+![[Mandlebrot.png|300]]
+
+We can see several issues
+
+* Framing: We are only seeing a small part of the set
+* Stretching: Our image is horizontally compressed
+* Color: Ours is ugly
+
+First up, lets fix the stretching. Remember when I talked about converting texture to UV coordinates, here lets look at the picture again real quick
+
+![[textureUV.jpeg|400]]
+
+Well the problem is that in our original texture coordinates, the Y axis(height) is 720 pixels, which is 560 pixels shorter than the X axis(width). This is a size difference of 43.75%, while in the UV Coordinates, both the X and Y axis are forced to be the same length, which effectively stretches the Y axis and shrinks the X axis. Not good for our Mandelbrot image.
+
+To fix this, we can just change which axis we choose to use to convert to UV space. Currently, we use both independently
+
+```C
+// Normalized pixel coordinates (from 0 to 1)
+vec2 c = fragCoord/iResolution.xy;
+```
+
+Instead we can just choose one axis to use to stretch both axis equally. In this case we just use the x axis because of very important reasons(I choose randomly ;)
+
+(In the code just delete the Y at the end of the line)
+
+```C
+// Normalized pixel coordinates (from 0 to 1)
+vec2 c = fragCoord/iResolution.x;
+```
+
+![[unStretched.png|300]]
+
+More progress!
+
+Now for the framing. This is kind of two problems in one, the scale(zoom), and the translation. First, like deal with the scale. We can deal with this by literally changing the plane on which the points are located
+
+```C
+// Normalized pixel coordinates (from 0 to 1)
+vec2 c = fragCoord/iResolution.x;
+    
+// Scale [lower is more zoomed in]
+float scale = 4.0;
+    
+c *= scale;
+```
+
+![[scaled.png|300]]
+
+And this makes sense when you think about it. Now, our plane is **4 times bigger**, so all points are now **4 time farther apart**. The smaller this number is(or more accurately, the closer it approaches to zero) the farther we will zoom into the set.
+
+Now for translation. This is pretty simple, we can just directly apply transformations to the point.
+
+```C
+// Normalized pixel coordinates (from 0 to 1)
+vec2 c = fragCoord/iResolution.x;
+    
+// Scale [lower is more zoomed in]
+float scale = 4.0;
+    
+c *= scale;
+
+// Move set into view
+c += vec2(-2.7,-1.1);
+```
+
+![[transformed.png|300]]
+
+I came up with these transformation with trail and error by the way, which is the way that you do a LOT of stuff in GLSL. Unlike more languages, GLSL has zero output other than the end shader result. There is no way to debug a variable, or even `console.log()` or `print()`
+
+Now for the fun part.. COLORS!!
 
 
 
