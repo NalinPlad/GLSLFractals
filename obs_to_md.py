@@ -16,5 +16,6 @@ with open("jam_obsidian.md", "r") as file:
     
 conversion = [convert_obsidian_to_md(line) for line in lines]
 
+#bump
 with open("jam.md", "w") as output_file:
     output_file.writelines(conversion)
