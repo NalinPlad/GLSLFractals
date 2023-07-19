@@ -492,6 +492,45 @@ I came up with these transformation with trail and error by the way, which is th
 
 Now for the fun part.. COLORS!!
 
+There are a few ways we can color this set, and we have lots of information about a pixel to use when coloring it, but a really popular way to do it is to follow this flow
+1. Is the point in the Mandelbrot set? 
+	1. Yes: Color that point **BLACK**
+	2. No: Color that point **Based on *how many iterations it took before the point escaped to infinity***
+
+Luckily we are already doing the calculation in a for loop, so we have access to the variable `i`, which tells us how many iterations have passed. When we hit the if statement and we have escaped, we can use that variable `i` to see how many iterations have passed. Lets try making a greyscale image with `i` being the brightness if the point escapes. 
+
+One thing to remember is that we need to normalize the variable first, so we can just divide it by `maxIterations`
+
+```C
+if(dot(Z, Z) > 4.0) {
+	// Normalize i for brightness
+	float brightness = float(i) / float(maxIterations)
+	
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    break;
+```
+
+The cool thing is that `vectors` have a pretty amazing constructor so if we run `vec3(1.0)` the constructor will fill in the other two value with the single one provided
+
+```C
+a = vec3(1.0) // => vec3(1.0, 1.0, 1.0)
+b = vec4(2.4) // => vec4(2.4, 2.4, 2.4, 2.4)
+
+vec4(a, 5.0) // => vec4(1.0, 1.0, 1.0, 5.0)
+```
+
+So lets use that to generate the brightness of the pixel
+
+```C
+if(dot(Z, Z) > 4.0) {
+    // Normalize i for brightness
+    float brightness = float(i) / float(maxIterations);
+            
+    fragColor = vec4(vec3(brightness), 1.0);
+    break;
+```
+
+![[bw.png|700]]
 
 
 ## old stuff ignore
