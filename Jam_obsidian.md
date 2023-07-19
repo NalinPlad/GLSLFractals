@@ -1,5 +1,6 @@
 # GLSL Fractals
 Time estimate: 60 minutes
+test
 
 ![[Mandlebrot.png|500]]
 
