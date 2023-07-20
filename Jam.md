@@ -14,7 +14,7 @@ presentationPDF: ""
 notes: ""
 poster: ""
 video: ""
-slug: 'glsl-s'
+slug: 'glsl-shaders'
 ---
 
 
