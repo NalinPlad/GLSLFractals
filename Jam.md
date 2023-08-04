@@ -1,5 +1,5 @@
 ---
-title: "Create INFINITE art with math (and code)"
+title: "Create INFINITE ART with math (and code)"
 description: >  
   In this jam, you'll learn about the Mandelbrot set, and how to render it in realtime using ShaderToy.
 contributor: 'NalinPlad'  
@@ -78,12 +78,12 @@ Now this formula needs an input. That input is a complex number. As you can reca
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/pointC.jpeg" width="300">
 
 Now to find the next number in the sequence, the formula states we
-1. Take the **previous** number in the sequence and **Square it**
+1. Take the **last** number in the sequence and **Square it**
 2. Add a complex number **C** to the result
 
 So lets do that;
 
-Currently our sequence is just `[0]` so in this case, `0` is the previous number in the sequence, and for the complex number, ours is `1 + 2i`. So our equation for the next number in the sequence is
+Currently our sequence is just `[0]` so in this case, `0` is the last number in the sequence, and for the complex number, ours is `1 + 2i`. So our equation for the next number in the sequence is
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/index2.jpeg" width="300">
 
@@ -91,7 +91,7 @@ The zero can be discarded and we are left with `(1 + 2i)`
 
 `Our sequence => 0, 1 + 2i`
 
-Now lets repeat that. Now to find the third number in the sequence, we take the square of the previous number(which is what we just found), and add our complex number C to it.
+Now lets repeat that. Now to find the third number in the sequence, we take the square of the last number(which is what we just found), and add our complex number C to it.
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/index3.jpeg" width="500">
 
@@ -146,9 +146,8 @@ To see what I mean, lets try a different point. This time I'll leave out all of 
 
 You can see that instead of escaping out into infinity, this point seems to do the opposite, and sort of falls in towards the center and floats around. This type of point, one that does not explode out into infinity, *is* in the Mandelbrot set.
 
+## Intro to Shadertoy
 
-
-# The code
 At long last, its time to take all of our newly gained knowledge and make something out of it. We're going to be using **Shader Toy**, which is kind of like replit for high performance graphics shaders. Shader Toy lets us write **GLSL** shaders that run on the GPU. 
 
 **GLSL** is the language of WebGL, which is a technology that allows developers to write high performance graphics on the web.
@@ -163,7 +162,9 @@ After you click that, you'll land on a page that looks like this
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/newshader.png" width="500">
 
-I've gone ahead and filled out the Title and Description for this Jam.
+I've gone ahead and filled out the Title and Description for this Jam. Now lets get into GLSL!
+
+# Intro to GLSL
 
 We can see that we have a default starter shader already loaded. We're going to start from scratch so begin by replacing all the code in the code box with the following basic script. **Make sure to recompile by clicking the play button at the bottom left of the code box.**
 
@@ -309,7 +310,8 @@ fragColor = vec4(uv.x, 0.0, uv.y, 1.0);
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/outputPurple.png" width="300">
 
-## Coding the Mandelbrot set
+# Coding the Mandelbrot set
+
 Hopefully you're still with me, and hopefully you've either miraculously understood everything up until this point, or you are frantically searching on youtube for a better explanation of the Mandelbrot set(in which case I recommend [this one](https://www.youtube.com/watch?v=GiAj9WW1OfQ), [this one](https://www.youtube.com/watch?v=FFftmWSzgmk), and [The Mandelbrot Set: Atheists’ WORST Nightmare](https://www.youtube.com/watch?v=OlD2rcm971U))(Watch that last one at your own risk)
 
 We are dealing with some pretty high level and abstract mathematical concepts here, so if you want to have a solid foundation going into the end of this Jam, make sure you understand the math.
@@ -438,6 +440,8 @@ And then we get this image:
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/notGood.gif" width="300">
 
+# Fixing visual bugs
+
 Well hey, at least we're making progress! If we compare our image with another render of the set-
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/Mandlebrot.png" width="300">
@@ -511,6 +515,8 @@ I came up with these transformation with trail and error by the way, which is th
 
 Now for the fun part.. COLORS!!
 
+# Adding color
+
 There are a few ways we can color this set, and we have lots of information about a pixel to use when coloring it, but a really popular way to do it is to follow this flow
 1. Is the point in the Mandelbrot set? 
 	1. Yes: Color that point **BLACK**
@@ -550,6 +556,121 @@ if(dot(Z, Z) > 4.0) {
 ```
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/bw.png" width="700">
+CONGRATULATIONS, you just successfully rendered the Mandelbrot set! We still have a few more additions, like color, and camera movements.
+
+First, lets explore some different ways of coloring the set. One popular way is to apply different **weights** to the RED GREEN and BLUE values instead of them all using the same values.
+
+Basically it just means that we can make the RED GREEN and BLUE values increase at different rates, causing more diverse colors.
+
+So to reiterate, currently we are raising the RGB value equally
+
+```C
+// Current method. All channels(R G and B) increase at same rate
+numIters = 10
+RGB(10,10,10)
+
+numIters = 30
+RGB(30,30,30)
+```
+
+which means that all the possible values will be different shades of white. Instead of that, we can change how much each RGB value increases based on how much the number of iterations increases
+
+```C
+// New method. Apply different weights(mulitpliers) to channels
+numIters = 10
+RGB(10,8,6)
+
+numIters = 30
+RGB(30,20,10)
+```
+
+So lets actually implement that. Add a weights variable and multiply the brightness value by it.
+
+```C
+// multipliers for ( R   G   B ) values
+vec3 weights = vec3(1.0,1.0,1.0);
+
+fragColor = vec4(vec3(brightness) * weights, 1.0);
+break;
+```
+
+Right now, we have the same multiplier for all the value. Lets try making the set more blue
+
+```C
+vec3 weights = vec3(1.0,1.0,2.0);
+```
+
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/blueset.png" width="500">
+
+Cool! Now try out some more combinations of weights to color the set.
+
+	Tip: try bigger numbers (>10.0)
+
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/greenset.png" width="500">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/yellowset.png" width="500">
+
+Choose a color that you love, and the  we can move on to my favorite art of the jam!
+
+# Make it your own
+Im going to leave you guys with two more tool that will allow you to create infinite variations of the Mandelbrot set....
+
+1. Mutating the Mandelbrot formula
+2. Using `iTime`
+
+Before we do that, heres what our code looks like right now so you can catch up;
+
+```C
+// Squares a given complex number
+vec2 cSquare( in vec2 z ) 
+{
+    return vec2(
+            z.x * z.x - z.y * z.y,
+            2.0 * z.x * z.y
+        );
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 c = fragCoord/iResolution.x;
+    
+    // Scale [lower is more zoomed in]
+    float scale = 4.0;
+    
+    c *= scale;
+    
+    // Move set into view
+    c += vec2(-2.7,-1.1);
+    
+    // Maximum number of iterations
+    int maxIterations = 256;
+
+	// Starting point
+	vec2 Z = vec2(0,0);
+    
+    for(int i = 0; i < maxIterations; i++)
+    {
+        // Z(n+1) = Z(n)^2 + C
+        vec2 oldZ = Z;
+        Z = cSquare(oldZ) + c;
+        
+        if(dot(Z, Z) > 4.0) {
+            // Normalize i for brightness
+            float brightness = float(i) / float(maxIterations);
+            
+            // multipliers for ( R   G   B ) values
+            vec3 weights = vec3(10.0,10.0,2.0);
+            
+            fragColor = vec4(vec3(brightness) * weights, 1.0);
+            break;
+        } else {
+            fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        }
+    }
+}
+```
+
+Now if you click on the `shader inputs` drop down directly above the code box
 
 
 ## old stuff ignore
