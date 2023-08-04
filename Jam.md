@@ -341,6 +341,7 @@ int maxIterations = 256;
 Lets also add our initial Mandelbrot starting point of (0,0)
 
 ```C
+// Starting point
 vec2 Z = vec2(0,0)
 ```
 
@@ -404,6 +405,7 @@ Add this if statement to the bottom of the for loop
 // If the point escapes, color it differently
 if(dot(Z, Z) > 4.0) {
     fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    break;
 } else {
     fragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
@@ -558,6 +560,8 @@ if(dot(Z, Z) > 4.0) {
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/bw.png" width="700">
 CONGRATULATIONS, you just successfully rendered the Mandelbrot set! We still have a few more additions, like color, and camera movements.
 
+# Color weights
+
 First, lets explore some different ways of coloring the set. One popular way is to apply different **weights** to the RED GREEN and BLUE values instead of them all using the same values.
 
 Basically it just means that we can make the RED GREEN and BLUE values increase at different rates, causing more diverse colors.
@@ -609,8 +613,27 @@ Cool! Now try out some more combinations of weights to color the set.
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/greenset.png" width="500">
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/yellowset.png" width="500">
 
-Choose a color that you love, and the  we can move on to my favorite art of the jam!
+Choose a color that you love, and then we can move onto smooth (log) coloring
 
+# Smooth colors
+You probably noticed the banding on the image. The brightness values doesn't produce a perfect gradient, instead it steps down in large increments. We can fix this by making use of the double log formula. I'm not going to go into depth on this, but feel free to research it if you want to.
+
+First replace the brightness variable declaration as so
+```C
+float brightness = (float(i) - log2(log2(dot(Z,Z))) + 4.0) / float(maxIterations);
+```
+
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/almostBanding.png">
+
+This doesn't completely fix the problem, because we change the the brightness formula, we need to increase the escape radius as well from `4` to `20`.
+
+```C
+if(dot(Z, Z) > 20.0) {
+```
+
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/bandingFixed.png">
+
+!!! BEAUTIFUL !!! Now for my favorite part of the jam
 # Make it your own
 Im going to leave you guys with two more tool that will allow you to create infinite variations of the Mandelbrot set....
 
@@ -654,9 +677,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         vec2 oldZ = Z;
         Z = cSquare(oldZ) + c;
         
-        if(dot(Z, Z) > 4.0) {
+        if(dot(Z, Z) > 20.0) {
             // Normalize i for brightness
-            float brightness = float(i) / float(maxIterations);
+            float brightness = (float(i) - log2(log2(dot(Z,Z))) + 4.0) / float(maxIterations);
             
             // multipliers for ( R   G   B ) values
             vec3 weights = vec3(10.0,10.0,2.0);
@@ -670,34 +693,62 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 }
 ```
 
-Now if you click on the `shader inputs` drop down directly above the code box
+Now if you click on the `shader inputs` drop down directly above the code box...
+
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/shaderInputs.png" width="500">
+
+You can see a list of **built in variables**. These variables provide access to some important information about the current state of our shader.
+
+The most important one is `iTime`. It returns the current time of the shader animation as a float. It is very powerful when combined with a trigonometric function like `sin() cos() and tan()`.
+
+```C
+// multipliers for ( R   G   B ) values
+vec3 weights = vec3(sin(iTime) * 2.0 + 5.0, cos(iTime) * 3.0 + 5.0, sin(iTime) * 10.0);
+            
+fragColor = vec4(vec3(brightness) * weights, 1.0);
+```
+
+Again, really play around with these values! There are infinite permutations of these functions combined with `iTime` to explore!
+
+And my personal favorite way to make this yours is to edit the actual Mandelbrot formula. Remember this?
+
+```C
+// Z(n+1) = Z(n)^2 + C
+vec2 oldZ = Z;
+Z = cSquare(oldZ) + c;
+```
+
+Change it to anything. I mean it!! Try messing around with the function, like multiplying `c`, running `cSquare` multiple times, inverting variables, adding noise, subtracting value, multiplying by itself, literally anything will give you a unique output. Heres some examples for inspiration.
 
 
-## old stuff ignore
+```C
+vec2 oldZ = Z;
+Z = cSquare(oldZ + c) + c + cSquare(c * sin(iTime));
+```
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm1.png">
 
-Fractals come in many varieties, some very interesting and some very boring. Lets look at the simplest fractals for example.
+```C
+vec2 oldZ = Z;
+Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
+```
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm2.png">
 
-Lets imagine creating a tree. We start by placing one trunk in the ground.
+```C
+vec2 oldZ = Z;
+Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
+```
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm3.png">
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/gen1.jpeg" width="200">
+Just like everything in this jam... Just play with it! almost everything in this jam can be modified, tweaked, and changed to make this project yours! The best thing about writing this renderer in ShaderToy is that its all real time! No render time to wait, just change something and immediately see its effect.  If you want to keep learning, here are some resources and questions to keep learning with
 
-Now lets imagine that this tree splits into two branches
+1. Try messing with the `cSquare()` function. Maybe it doesn't have to "square" the complex number?
+2. Try increasing / decreasing the max iterations and the escape radius
+3. What are some other ways that color the set? Try using trigonometric functions...
+4. I wonder what the `iMouse` builtin variable does..
+5. Right now we color any points inside the Mandelbrot set black.. How else can we color them?
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/gen2.jpeg" width="200">
 
-And then splitting each of these branches into two additional branches, and so on and so on, splitting each new branch into two identical branches
+Finally, I want to leave you guys with a ShaderToy link of the completed project, so you can fork it if you ever got lost along the way. I hope you learned something, and happy hacking!
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/gen3.jpeg" width="300">
-
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/gen4.jpeg" width="300">
-
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/gen5.jpeg" width="400">
-
-And you can imagine this process continuing onto infinity, leaving a tree with infinitely many branches.
-
-At this point we can notice something very interesting. If you focus on only the first green branch, you can see that if you rotate it by 45 degrees, you are left with our original drawing. This property is called ***Self Similarity***, which is a common trait for fractals.
-
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/pano.jpeg">
-
-The Mandelbrot set is also self similar, but what even is the Mandelbrot set?
+[ShaderToy + source code](https://www.shadertoy.com/view/clfcRs)
 

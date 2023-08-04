@@ -735,20 +735,20 @@ Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
 
 ```C
 vec2 oldZ = Z;
-Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
+Z = cSquare(cSquare(oldZ) + c);
 ```
 ![[mandelPerm3.png]]
 
 Just like everything in this jam... Just play with it! almost everything in this jam can be modified, tweaked, and changed to make this project yours! The best thing about writing this renderer in ShaderToy is that its all real time! No render time to wait, just change something and immediately see its effect.  If you want to keep learning, here are some resources and questions to keep learning with
 
-1. Try messing with the `cSquare()` function. Maybe it doesn't have to "square" the complex number?
+1. Try messing with the `cSquare()` function. Maybe it doesn't have to "square" the complex number? Change it up randomly (z.y => z.x)
 2. Try increasing / decreasing the max iterations and the escape radius
 3. What are some other ways that color the set? Try using trigonometric functions...
 4. I wonder what the `iMouse` builtin variable does..
 5. Right now we color any points inside the Mandelbrot set black.. How else can we color them?
 
 
-Finally, I want to leave you guys with a ShaderToy link of the completed project, so you can fork it if you ever got lost along the way. I hope you learned something, and happy hacking!
+Finally, I want to leave you guys with 2 ShaderToy links, one of a fully completed project, and one of the project in its current state, so you can fork it if you ever got lost along the way. I hope you learned something, and happy hacking!
 
-[ShaderToy + source code](https://www.shadertoy.com/view/clfcRs)
-
+[Example Project - {Fully Complete}](https://www.shadertoy.com/view/clfcRs)
+[Example Project - {Base Code To Fork}](https://www.shadertoy.com/view/clfcRs)
