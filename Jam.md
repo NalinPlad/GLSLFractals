@@ -24,7 +24,7 @@ slug: 'glsl-shaders'
 
 You may have seen or heard of fractals. Even if you haven't, you've probably seen an hour long video of someone zooming into a picture, revealing more and more detail the farther they go.
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/Zoom.gif">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/Zoom.gif"/>
 
 Well this particular geometrical shape shown in the GIF is part of a large family of *infinitely* detailed, *infinitely* precise object, called **fractals**. Today, we are going to write a computer program that will allow us to create the same fractal you see in the images above, namely, the ***Mandelbrot set***
 
@@ -623,7 +623,7 @@ First replace the brightness variable declaration as so
 float brightness = (float(i) - log2(log2(dot(Z,Z))) + 4.0) / float(maxIterations);
 ```
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/almostBanding.png">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/almostBanding.png"/>
 
 This doesn't completely fix the problem, because we change the the brightness formula, we need to increase the escape radius as well from `4` to `20`.
 
@@ -631,7 +631,7 @@ This doesn't completely fix the problem, because we change the the brightness fo
 if(dot(Z, Z) > 20.0) {
 ```
 
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/bandingFixed.png">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/bandingFixed.png"/>
 
 !!! BEAUTIFUL !!! Now for my favorite part of the jam
 # Make it your own
@@ -725,19 +725,19 @@ Change it to anything. I mean it!! Try messing around with the function, like mu
 vec2 oldZ = Z;
 Z = cSquare(oldZ + c) + c + cSquare(c * sin(iTime));
 ```
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm1.png">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm1.png"/>
 
 ```C
 vec2 oldZ = Z;
 Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
 ```
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm2.png">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm2.png"/>
 
 ```C
 vec2 oldZ = Z;
 Z = cSquare(cSquare(oldZ) + c);
 ```
-<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm3.png">
+<img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/mandelPerm3.png"/>
 
 Just like everything in this jam... Just play with it! almost everything in this jam can be modified, tweaked, and changed to make this project yours! The best thing about writing this renderer in ShaderToy is that its all real time! No render time to wait, just change something and immediately see its effect.  If you want to keep learning, here are some resources and questions to keep learning with
 

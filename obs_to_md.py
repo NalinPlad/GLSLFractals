@@ -5,7 +5,7 @@ def convert_obsidian_to_md(input_line):
     
     # Recognize the first pattern and replace it
     r1 = re.compile(r'!\[\[(.*?\.\w+)\|(\d+?)\]\]')
-    line = r1.sub(f'<img src="{base_url}/\\1" width="\\2">', input_line)
+    line = r1.sub(f'<img src="{base_url}/\\1" width="\\2"/>', input_line)
 
     # Recognize the second pattern and replace it
     r2 = re.compile(r'!\[\[(.*?\.\w+)\]\]')
