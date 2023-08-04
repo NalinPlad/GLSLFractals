@@ -623,7 +623,7 @@ First replace the brightness variable declaration as so
 float brightness = (float(i) - log2(log2(dot(Z,Z))) + 4.0) / float(maxIterations);
 ```
 
-![[almostBanding.png]]
+![[almostBanding.png|500]]
 
 This doesn't completely fix the problem, because we change the the brightness formula, we need to increase the escape radius as well from `4` to `20`.
 
@@ -631,7 +631,7 @@ This doesn't completely fix the problem, because we change the the brightness fo
 if(dot(Z, Z) > 20.0) {
 ```
 
-![[bandingFixed.png]]
+![[bandingFixed.png|500]]
 
 !!! BEAUTIFUL !!! Now for my favorite part of the jam
 ## Make it your own
@@ -725,19 +725,19 @@ Change it to anything. I mean it!! Try messing around with the function, like mu
 vec2 oldZ = Z;
 Z = cSquare(oldZ + c) + c + cSquare(c * sin(iTime));
 ```
-![[mandelPerm1.png]]
+![[mandelPerm1.png|500]]
 
 ```C
 vec2 oldZ = Z;
 Z = cSquare(c) + c + cSquare(oldZ - sin(iTime));
 ```
-![[mandelPerm2.png]]
+![[mandelPerm2.png|500]]
 
 ```C
 vec2 oldZ = Z;
 Z = cSquare(cSquare(oldZ) + c);
 ```
-![[mandelPerm3.png]]
+![[mandelPerm3.png|500]]
 
 ## Final Thoughts! + Source Code
 
