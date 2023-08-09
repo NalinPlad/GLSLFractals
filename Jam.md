@@ -31,6 +31,7 @@ Well this particular geometrical shape shown in the GIF is part of a large famil
 The Mandelbrot set is actually very interesting mathematically, and you can learn a lot by implementing a renderer for it. Thats what were going to do today, you find out that theres so much more that you can do with fractals than just zooming in...
 
 <img src="https://raw.githubusercontent.com/NalinPlad/GLSLFractals/main/capture.gif"/>
+
 Link to [example completed project](https://www.shadertoy.com/view/mlsczN)
 
 ## What is the Mandelbrot set?
